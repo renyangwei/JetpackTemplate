@@ -1,5 +1,9 @@
 package com.ryw.jetpackexample;
 
+
+//import com.google.gson.annotations.SerializedName;
+
+import com.ryw.mapo.anotations.Expose;
 import com.ryw.mapo.anotations.SerializedName;
 
 public class BaseBean {
@@ -8,6 +12,7 @@ public class BaseBean {
     public String appId;
 
     @SerializedName("app_key")
+    @Expose(serialize = false)
     public String appKey;
 
 

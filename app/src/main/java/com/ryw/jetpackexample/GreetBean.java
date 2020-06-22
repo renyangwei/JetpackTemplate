@@ -1,8 +1,11 @@
 package com.ryw.jetpackexample;
 
+
+//import com.google.gson.annotations.SerializedName;
+
 import com.ryw.mapo.anotations.SerializedName;
 
-public class InsertBean extends BaseBean{
+public class GreetBean extends BaseBean{
 
     @SerializedName("first_name")
     private String firstName;

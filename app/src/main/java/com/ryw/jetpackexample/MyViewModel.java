@@ -18,7 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MyViewModel extends AndroidViewModel {
 
-    private MutableLiveData<String> insertResp;
+    private MutableLiveData<String> greetResp;
 
     private Retrofit retrofit;
 
@@ -34,47 +34,82 @@ public class MyViewModel extends AndroidViewModel {
         jetPackService = retrofit.create(JetPackService.class);
     }
 
-    public MutableLiveData<String> getInsertResp() {
-        if (insertResp == null) {
-            insertResp = new MutableLiveData<>();
+    public MutableLiveData<String> greetFormUrl() {
+        if (greetResp == null) {
+            greetResp = new MutableLiveData<>();
 
         }
-        loadData();
-        return insertResp;
+        loadFormUrl();
+        return greetResp;
     }
 
 
-    public void loadData() {
+    public void loadFormUrl() {
         // 使用网络数据
-        InsertBean insertBean = new InsertBean();
+        GreetBean insertBean = new GreetBean();
         insertBean.setFirstName("你好 *$#!^adsf");
-        insertBean.setLastName("世界");
+        insertBean.setLastName("formurl");
         insertBean.setAppId("123456");
         insertBean.setAppKey("dhaofanohkhjljk");
-        try {
-            Mapo mapo = new Mapo();
-            Map<String, String> map = mapo.toMap(insertBean);
-            Log.e("Jetpack", mapo.toFormUrlEncoded(map));
-            Call<JetPackRespBean> call = jetPackService.insert(map);
-            call.enqueue(new Callback<JetPackRespBean>() {
-                @Override
-                public void onResponse(Call<JetPackRespBean> call, Response<JetPackRespBean> response) {
-                    String data = response.body().getData();
-                    if (data != null) {
-                        insertResp.setValue(data);
-                    } else {
-                        insertResp.setValue("");
-                    }
+        Mapo mapo = new Mapo();
+        Map<String, String> map = mapo.toMap(insertBean);
+        Log.e("Jetpack", mapo.toFormUrlString(map));
+        Call<JetPackRespBean> call = jetPackService.greetFormUrl(map);
+        call.enqueue(new Callback<JetPackRespBean>() {
+            @Override
+            public void onResponse(Call<JetPackRespBean> call, Response<JetPackRespBean> response) {
+                String data = response.body().getData();
+                if (data != null) {
+                    greetResp.setValue(data);
+                } else {
+                    greetResp.setValue("");
                 }
+            }
 
-                @Override
-                public void onFailure(Call<JetPackRespBean> call, Throwable t) {
-                    insertResp.setValue(t.getLocalizedMessage());
-                }
-            });
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+            @Override
+            public void onFailure(Call<JetPackRespBean> call, Throwable t) {
+                greetResp.setValue(t.getLocalizedMessage());
+            }
+        });
 
     }
+
+    public MutableLiveData<String> greetJson() {
+        if (greetResp == null) {
+            greetResp = new MutableLiveData<>();
+
+        }
+        loadJson();
+        return greetResp;
+    }
+
+    public void loadJson() {
+        // 使用网络数据
+        GreetBean insertBean = new GreetBean();
+        insertBean.setFirstName("你好 *$#!^adsf");
+        insertBean.setLastName("json");
+        insertBean.setAppId("123456");
+        insertBean.setAppKey("dhaofanohkhjljk");
+        Call<JetPackRespBean> call = jetPackService.greetJson(insertBean);
+        call.enqueue(new Callback<JetPackRespBean>() {
+            @Override
+            public void onResponse(Call<JetPackRespBean> call, Response<JetPackRespBean> response) {
+                String data = response.body().getData();
+                if (data != null) {
+                    greetResp.setValue(data);
+                } else {
+                    greetResp.setValue("");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JetPackRespBean> call, Throwable t) {
+                greetResp.setValue(t.getLocalizedMessage());
+            }
+        });
+
+
+    }
+
+
 }

@@ -4,7 +4,6 @@ package com.ryw.jetpackexample;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -48,20 +47,31 @@ public class Fragment1 extends Fragment {
             NavController controller = Navigation.findNavController(v);
             controller.navigate(R.id.action_fragment1_to_fragment2);
         });
-        Button btnInsert = view.findViewById(R.id.btn_insert);
-        btnInsert.setOnClickListener(onInsert);
+        Button btnFormUrl = view.findViewById(R.id.btn_greet_form_url);
+        btnFormUrl.setOnClickListener(onGreet);
+        Button btnJson = view.findViewById(R.id.btn_greet_json);
+        btnJson.setOnClickListener(onGreet);
         tvResp = view.findViewById(R.id.tv_resp);
-        myViewModel.getInsertResp().observe(requireActivity(), s -> tvResp.setText(s));
+        myViewModel.greetFormUrl().observe(requireActivity(), s -> tvResp.setText(s));
         return view;
     }
 
-    private View.OnClickListener onInsert = new View.OnClickListener() {
+    private View.OnClickListener onGreet = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             // 监听数据
-            myViewModel.loadData();
+            switch (v.getId()) {
+                case R.id.btn_greet_form_url:
+                    myViewModel.loadFormUrl();
+                    break;
+                case R.id.btn_greet_json:
+                    myViewModel.loadJson();
+                    break;
+            }
         }
     };
+
+
 
 
 }

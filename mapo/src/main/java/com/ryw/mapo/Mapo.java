@@ -7,8 +7,10 @@ import com.ryw.mapo.anotations.Expose;
 import com.ryw.mapo.anotations.SerializedName;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,47 +25,55 @@ public class Mapo {
     }
 
     /**
-     * 转换成键值对
-     * 根据getXxx()方法判断
-     * 但是不能判断注解
-     * 所以要结合在一起
-     * 先判断属性
-     * 然后判断方法
-     * 好像都不行
+     * 对象转换成键值对
      * @param object    对象
      * @return          Map
      */
-    public Map<String, String> toMap(Object object) throws IllegalAccessException {
+    public Map<String, String> toMap(Object object) {
         Map<String, String> map = new HashMap<>();
-        Class clazz = object.getClass();
-        Log.d(LOG_TAG, "className=" + clazz.getSimpleName());
-        Field[] fields = clazz.getFields();
-        for (Field field : fields) {
-            field.setAccessible(true);
-            String key = field.getName();
-            Object value = field.get(object);
-            String s = String.valueOf(value);
-            if (field.getAnnotations() != null) {
-                if (field.isAnnotationPresent(Expose.class)) {
-                    Expose expose = field.getAnnotation(Expose.class);
-                    if (!expose.serialize())
-                        continue;
-                }
-                if (field.isAnnotationPresent(SerializedName.class)) {
-                    SerializedName serializedName = field.getAnnotation(SerializedName.class);
-                    String v = serializedName.value();
-                    if (!TextUtils.isEmpty(v)) {
-                        key = v;
+        try {
+            Class clazz = object.getClass();
+            Log.d(LOG_TAG, "className=" + clazz.getSimpleName());
+            List<Field> fieldList = new ArrayList<>() ;
+            while (clazz != null && !clazz.getName().toLowerCase().equals("java.lang.object")) {//当父类为null的时候说明到达了最上层的父类(Object类).
+                fieldList.addAll(Arrays.asList(clazz .getDeclaredFields()));
+                clazz = clazz.getSuperclass(); //得到父类,然后赋给自己
+            }
+            for (Field field : fieldList) {
+                field.setAccessible(true);
+                String key = field.getName();
+                Object value = field.get(object);
+                String s = String.valueOf(value);
+                if (field.getAnnotations() != null) {
+                    if (field.isAnnotationPresent(Expose.class)) {
+                        Expose expose = field.getAnnotation(Expose.class);
+                        if (!expose.serialize())
+                            continue;
+                    }
+                    if (field.isAnnotationPresent(SerializedName.class)) {
+                        SerializedName serializedName = field.getAnnotation(SerializedName.class);
+                        String v = serializedName.value();
+                        if (!TextUtils.isEmpty(v)) {
+                            key = v;
+                        }
                     }
                 }
+                map.put(key, s);
+                Log.d(LOG_TAG, field.getName());
             }
-            map.put(key, s);
-            Log.d(LOG_TAG, field.getName());
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
         return map;
     }
 
-    public String toFormUrlEncoded(Map<String, String> map) {
+
+    /**
+     * 转化成FormUrl
+     * @param map   键值对
+     * @return      字符串
+     */
+    public String toFormUrlString(Map<String, String> map) {
         if (map.isEmpty()) {
             return "";
         }
