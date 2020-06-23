@@ -7,4 +7,5 @@
     <string name="hello_2">返回</string>
     <string name="insert">greet_form_url</string>
     <string name="json">json</string>
+    <string name="splash">闪屏</string>
 </resources>
